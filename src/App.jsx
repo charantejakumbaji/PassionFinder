@@ -21,12 +21,17 @@ function App() {
   // Initialize session
   useEffect(() => {
     const initSession = async () => {
-      const user = await getCurrentUser();
-      if (user) {
-        setCurrentUser(user);
-        await loadUserData(user.id);
-      } else {
-        setCurrentScreen('auth');
+      try {
+        const user = await getCurrentUser();
+        if (user) {
+          setCurrentUser(user);
+          await loadUserData(user.id);
+        } else {
+          setCurrentScreen('auth');
+        }
+      } catch (err) {
+        console.error("Session init failed:", err);
+        setCurrentScreen('auth'); // Fallback to auth if check fails
       }
     };
     initSession();
