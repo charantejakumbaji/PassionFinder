@@ -206,6 +206,17 @@ export const updateProfile = async (userId, profileData) => {
   if (error) throw error;
 };
 
+export const getProfile = async (userId) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('bio, goal, interests')
+    .eq('id', userId)
+    .single();
+  
+  if (error && error.code !== 'PGRST116') throw error;
+  return data;
+};
+
 export const deleteTask = async (id) => {
   const { error } = await supabase.from('tasks').delete().eq('id', id);
   if (error) throw error;

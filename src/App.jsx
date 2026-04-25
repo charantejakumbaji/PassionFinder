@@ -9,7 +9,7 @@ import FinalResults from './components/FinalResults';
 import Profile from './components/Profile';
 import AdminDashboard from './components/AdminDashboard';
 import Tasks from './components/Tasks';
-import { getCurrentUser, getUserHistory, getProgress, saveAttempt, logoutUser, saveProgress, checkAdmin } from './utils/storage';
+import { getCurrentUser, getUserHistory, getProgress, saveAttempt, logoutUser, saveProgress, checkAdmin, getProfile } from './utils/storage';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -38,23 +38,17 @@ function App() {
   }, []);
 
   const loadUserData = async (userId) => {
-    // Fetch History & Progress
-    const [userHistory, progress, adminStatus] = await Promise.all([
+    // Fetch Everything in parallel
+    const [userHistory, progress, adminStatus, profile] = await Promise.all([
       getUserHistory(userId),
       getProgress(userId),
-      checkAdmin(userId)
+      checkAdmin(userId),
+      getProfile(userId)
     ]);
 
     setHistory(userHistory);
     setResumeData(progress);
     setIsAdmin(adminStatus);
-    
-    // Fetch Extended Profile
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('bio, goal, interests')
-      .eq('id', userId)
-      .single();
     
     if (profile) {
       setCurrentUser(prev => ({ ...prev, ...profile }));
