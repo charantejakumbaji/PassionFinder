@@ -251,7 +251,7 @@ const AdminDashboard = () => {
           {/* List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <h4 style={{ opacity: 0.6, fontSize: '0.8rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
-              {activeTab === 'questions' ? 'Assessment' : 'Feedback'} Questions ({activeTab === 'questions' ? questions : feedback}.length)
+              {activeTab === 'questions' ? 'Assessment' : 'Feedback'} Questions ({(activeTab === 'questions' ? questions : feedback).length})
             </h4>
             {(activeTab === 'questions' ? questions : feedback).map(item => (
               <div key={item.id} className="glass-card" style={{ display: 'flex', gap: '1rem', padding: '1.25rem', alignItems: 'flex-start' }}>
