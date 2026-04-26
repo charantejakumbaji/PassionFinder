@@ -201,15 +201,18 @@ const AdminDashboard = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <h3>User Feedback</h3>
           {feedback.length === 0 ? <p>No feedback received yet.</p> : feedback.map(f => (
-            <div key={f.id} className="glass-card" style={{ padding: '1rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+            <div key={f.id} className="glass-card" style={{ padding: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', gap: '0.5rem' }} className="flex-column-mobile">
                 <span className="badge" style={{ background: 'var(--accent)', color: '#000' }}>{f.tasks?.title}</span>
-                <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{new Date(f.created_at).toLocaleString()}</span>
+                <span style={{ fontSize: '0.75rem', opacity: 0.5 }}>{new Date(f.created_at).toLocaleString()}</span>
               </div>
-              <p style={{ fontWeight: 'bold', margin: '0.5rem 0' }}>{f.profiles?.full_name || 'Anonymous'}</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.85rem' }}>
+              <p style={{ fontWeight: 'bold', margin: '0.5rem 0', color: 'var(--text-main)' }}>{f.profiles?.full_name || 'Anonymous'}</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', fontSize: '0.85rem' }}>
                 {Object.entries(f.responses || {}).map(([k, v]) => (
-                  <div key={k}><span style={{ opacity: 0.6 }}>{k}:</span> {v}</div>
+                  <div key={k} style={{ background: 'rgba(255,255,255,0.02)', padding: '0.5rem', borderRadius: '8px' }}>
+                    <div style={{ opacity: 0.5, fontSize: '0.7rem', textTransform: 'uppercase', marginBottom: '0.2rem' }}>{k}</div>
+                    <div>{v}</div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -362,23 +365,23 @@ const AdminDashboard = () => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {(activeTab === 'questions' ? questions : tasks).map((item) => (
-              <div key={item.id} className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem' }}>
-                <div>
-                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <div key={item.id} className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 1.5rem', gap: '1rem' }} className="flex-column-mobile">
+                <div style={{ flex: 1 }} className="w-100-mobile">
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
                     <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--text-muted)' }}>L{item.level_id}</span>
-                    {item.type && <span className="badge" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--accent)', border: '1px solid var(--accent)' }}>{item.type}</span>}
-                    {item.trait && <span className="badge" style={{ background: 'rgba(138, 43, 226, 0.1)', color: 'var(--primary)' }}>{item.trait}</span>}
-                    <h4 style={{ margin: 0 }}>{item.text || item.title}</h4>
+                    {item.type && <span className="badge" style={{ background: 'rgba(138, 43, 226, 0.1)', color: 'var(--primary)', border: '1px solid rgba(138,43,226,0.2)' }}>{item.type}</span>}
+                    {item.trait && <span className="badge" style={{ background: 'rgba(0, 242, 254, 0.1)', color: 'var(--accent)', border: '1px solid rgba(0,242,254,0.2)' }}>{item.trait}</span>}
                   </div>
-                  <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', opacity: 0.6 }}>
+                  <h4 style={{ margin: 0, fontSize: '1rem', lineHeight: 1.4 }}>{item.text || item.title}</h4>
+                  <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', opacity: 0.5 }}>
                     {activeTab === 'questions' 
-                      ? `${item.options.length} options mapped to ${[...new Set(item.options.map(o => typeof o === 'object' ? o.trait : 'legacy'))].join(', ')}`
+                      ? `${item.options?.length || 0} options • ${[...new Set((item.options || []).map(o => typeof o === 'object' ? o.trait : 'legacy'))].join(', ')}`
                       : item.duration}
                   </p>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button className="btn btn-outline" style={{ padding: '0.5rem' }} onClick={() => handleEdit(item)}>✏️</button>
-                  <button className="btn btn-outline" style={{ padding: '0.5rem', borderColor: '#ff4b4b' }} onClick={() => handleDelete(item.id)}>🗑️</button>
+                <div style={{ display: 'flex', gap: '0.5rem' }} className="w-100-mobile">
+                  <button className="btn btn-outline" style={{ padding: '0.6rem', flex: 1 }} onClick={() => handleEdit(item)}>✏️ Edit</button>
+                  <button className="btn btn-outline" style={{ padding: '0.6rem', borderColor: 'rgba(255,75,75,0.3)', color: '#ff4b4b', flex: 1 }} onClick={() => handleDelete(item.id)}>🗑️ Delete</button>
                 </div>
               </div>
             ))}
