@@ -16,18 +16,23 @@ export const getCurrentUser = async () => {
  * HISTORY & PROGRESS
  */
 
-export const saveAttempt = async (userId, attempt) => {
+export const saveAttempt = async (userId, session) => {
   const { error } = await supabase
     .from('results')
     .insert({
       user_id: userId,
       traits: {
-        strengths: attempt.strengths,
-        careers: attempt.careers
+        strengths: session.strengths || [],
+        careers: session.careers || [],
+        topTrait: session.topTrait
       },
       career_recommendations: {
-        loopType: attempt.loopType || 'standard'
-      }
+        level: session.level || 0,
+        answers: session.answers || [],
+        task: session.task || null,
+        feedback: session.feedback || null
+      },
+      completed_at: new Date().toISOString()
     });
 
   if (error) {
@@ -44,19 +49,24 @@ export const getUserHistory = async (userId) => {
     .from('results')
     .select('*')
     .eq('user_id', userId)
-    .order('completed_at', { ascending: true });
+    .order('completed_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching history:', error);
     return [];
   }
 
-  // Map back to the format the app expects
+  // Map back to a clean format for the Profile
   return data.map(record => ({
-    ...record.traits,
-    ...record.career_recommendations,
     id: record.id,
-    date: record.completed_at
+    date: record.completed_at,
+    level: record.career_recommendations?.level || 0,
+    strengths: record.traits?.strengths || [],
+    careers: record.traits?.careers || [],
+    topTrait: record.traits?.topTrait,
+    answers: record.career_recommendations?.answers || [],
+    task: record.career_recommendations?.task || null,
+    feedback: record.career_recommendations?.feedback || null
   }));
 };
 
@@ -115,10 +125,12 @@ export const checkAdmin = async (userId) => {
   return data?.is_admin || false;
 };
 
-export const getQuestions = async () => {
+export const getQuestions = async (type = 'assessment', level = 0) => {
   const { data, error } = await supabase
     .from('questions')
     .select('*')
+    .eq('type', type)
+    .eq('level_id', level)
     .order('id', { ascending: true });
   if (error) throw error;
   return data;
@@ -128,6 +140,7 @@ export const getAdminQuestions = async () => {
   const { data, error } = await supabase
     .from('questions')
     .select('*')
+    .order('type', { ascending: true })
     .order('id', { ascending: true });
   if (error) throw error;
   return data;
@@ -135,6 +148,7 @@ export const getAdminQuestions = async () => {
 
 export const saveQuestion = async (question) => {
   const { id, ...payload } = question;
+  if (!payload.type) payload.type = 'assessment'; // Default
   if (id) {
     const { error } = await supabase.from('questions').update(payload).eq('id', id);
     if (error) throw error;
@@ -159,15 +173,57 @@ export const getAdminTasks = async () => {
   return data;
 };
 
+export const getTasksByTrait = async (trait, level = 0) => {
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('*')
+    .eq('trait', trait)
+    .eq('level_id', level);
+  if (error) throw error;
+  return data;
+};
+
 export const saveTask = async (task) => {
   const { id, ...payload } = task;
-  if (id) {
-    const { error } = await supabase.from('tasks').update(payload).eq('id', id);
-    if (error) throw error;
-  } else {
-    const { error } = await supabase.from('tasks').insert(payload);
-    if (error) throw error;
+  try {
+    if (id) {
+      const { error } = await supabase.from('tasks').update(payload).eq('id', id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from('tasks').insert(payload);
+      if (error) throw error;
+    }
+  } catch (error) {
+    if (error.code === '42703') {
+      throw new Error("Database Sync Error: Your 'tasks' table is missing the 'description' or 'trait' columns. Please run the ALTER TABLE command in Supabase SQL Editor.");
+    }
+    throw error;
   }
+};
+
+/**
+ * FEEDBACK
+ */
+
+export const saveTaskFeedback = async (userId, taskId, feedback) => {
+  const { error } = await supabase
+    .from('task_feedback')
+    .insert({
+      user_id: userId,
+      task_id: taskId,
+      responses: feedback,
+      created_at: new Date().toISOString()
+    });
+  if (error) throw error;
+};
+
+export const getAllFeedback = async () => {
+  const { data, error } = await supabase
+    .from('task_feedback')
+    .select('*, profiles(full_name), tasks(title)')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
 };
 
 /**
@@ -186,6 +242,15 @@ export const getSystemStats = async () => {
     totalDiscoveries: results.count || 0,
     totalTasks: tasks.count || 0
   };
+};
+
+export const getAllUsers = async () => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
 };
 
 /**
@@ -221,6 +286,15 @@ export const deleteTask = async (id) => {
   const { error } = await supabase.from('tasks').delete().eq('id', id);
   if (error) throw error;
 };
+
+export const deleteResult = async (id) => {
+  const { error } = await supabase.from('results').delete().eq('id', id);
+  if (error) throw error;
+};
+
+/**
+ * PROGRESS / SESSIONS
+ */
 
 /**
  * USER TASKS (Level 1)
