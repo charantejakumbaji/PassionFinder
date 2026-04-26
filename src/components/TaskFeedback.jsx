@@ -7,10 +7,30 @@ const TaskFeedback = ({ taskId, userId, onComplete }) => {
   const [responses, setResponses] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [completed, setCompleted] = useState(false);
 
+  // 4 rich, meaningful fallback reflection questions
   const EMERGENCY_FEEDBACK = [
-    { id: 'f1', text: 'How did you feel while performing this task?', options: ['Energized', 'Bored', 'Challenged', 'Confused'] },
-    { id: 'f2', text: 'Could you imagine doing this every day?', options: ['Yes, definitely', 'Maybe as a hobby', 'Not really', 'Absolutely not'] }
+    {
+      id: 'f1',
+      text: 'How did you feel while performing this task?',
+      options: ['⚡ Energized & in the zone', '😐 Neutral, it was okay', '😴 Bored, it felt repetitive', '😕 Confused & frustrated']
+    },
+    {
+      id: 'f2',
+      text: 'How quickly did time seem to pass while doing it?',
+      options: ['🚀 Very fast — I lost track of time', '⏳ Normal — it felt measured', '🐢 Slow — I kept checking the clock', '⏰ I had to force myself to finish']
+    },
+    {
+      id: 'f3',
+      text: 'Could you imagine doing this type of work professionally?',
+      options: ['✅ Yes, I would love that', '🤔 Maybe as part of my work', '🔄 Only as a hobby, not full-time', '❌ No, not at all']
+    },
+    {
+      id: 'f4',
+      text: 'After completing the task, how do you feel right now?',
+      options: ['💪 Proud & accomplished', '😌 Satisfied but not excited', '😐 Indifferent — it was just a task', '🧠 Mentally drained']
+    },
   ];
 
   useEffect(() => {
@@ -47,14 +67,19 @@ const TaskFeedback = ({ taskId, userId, onComplete }) => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
+      // Show completion flash before navigating
       setSaving(true);
+      setCompleted(true);
       try {
         if (userId && taskId) {
           await saveTaskFeedback(userId, taskId, newResponses);
         }
+        // Brief pause to show completion animation
+        await new Promise(r => setTimeout(r, 1400));
         onComplete(newResponses);
       } catch (err) {
         console.error(err);
+        await new Promise(r => setTimeout(r, 1400));
         onComplete(newResponses);
       } finally {
         setSaving(false);
@@ -68,12 +93,30 @@ const TaskFeedback = ({ taskId, userId, onComplete }) => {
     }
   };
 
-  if (loading) return <div className="glass-card animate-up">Loading Feedback Questions...</div>;
-  
-  // Fallback if no feedback questions exist
+  if (loading) {
+    return (
+      <div className="glass-card animate-up" style={{ textAlign: 'center', padding: '3rem', maxWidth: '600px', margin: '0 auto' }}>
+        <div className="loading-spinner" style={{ margin: '0 auto 1rem' }} />
+        <p>Loading reflection questions...</p>
+      </div>
+    );
+  }
+
+  // Completion Flash Screen
+  if (completed) {
+    return (
+      <div className="glass-card animate-up" style={{ textAlign: 'center', padding: '4rem 2rem', maxWidth: '600px', margin: '0 auto' }}>
+        <div style={{ fontSize: '4rem', marginBottom: '1rem', animation: 'fadeInUp 0.5s ease-out' }}>🎉</div>
+        <h2 style={{ marginBottom: '0.5rem' }}>Reflection Complete!</h2>
+        <p style={{ opacity: 0.7 }}>Processing your discovery results...</p>
+        <div className="loading-spinner" style={{ margin: '1.5rem auto 0' }} />
+      </div>
+    );
+  }
+
   if (questions.length === 0) {
     return (
-      <div className="glass-card animate-up" style={{ textAlign: 'center' }}>
+      <div className="glass-card animate-up" style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
         <h2>Reflection</h2>
         <p>Your session is complete. Ready to see results?</p>
         <button className="btn btn-primary btn-large" style={{ width: '100%', marginTop: '1.5rem' }} onClick={() => onComplete({})}>
@@ -84,9 +127,11 @@ const TaskFeedback = ({ taskId, userId, onComplete }) => {
   }
 
   const currentQ = questions[currentIndex];
+  const progressPct = ((currentIndex + 1) / questions.length) * 100;
 
   return (
     <div className="glass-card animate-up" key={currentIndex} style={{ maxWidth: '600px', margin: '0 auto' }}>
+      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
         <button 
           className="btn btn-outline" 
@@ -97,15 +142,21 @@ const TaskFeedback = ({ taskId, userId, onComplete }) => {
           ← Back
         </button>
         <span className="badge" style={{ background: 'var(--secondary)', color: '#fff' }}>
-          Reflection {currentIndex + 1} of {questions.length}
+          Stage 3 of 3: Reflection {currentIndex + 1}/{questions.length}
         </span>
       </div>
 
+      {/* Progress Bar */}
       <div className="progress-container" style={{ marginBottom: '2rem' }}>
-        <div className="progress-bar" style={{ width: `${((currentIndex + 1) / questions.length) * 100}%`, background: 'var(--secondary)' }}></div>
+        <div className="progress-bar" style={{ width: `${progressPct}%`, background: 'var(--secondary)' }} />
+      </div>
+
+      {/* Motivational sub-label */}
+      <div style={{ fontSize: '0.8rem', opacity: 0.45, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '1rem' }}>
+        Post-Task Reflection · Be honest with yourself
       </div>
       
-      <h2 style={{ marginBottom: '2rem' }}>{currentQ.text}</h2>
+      <h2 style={{ marginBottom: '2rem', lineHeight: 1.4 }}>{currentQ.text}</h2>
       
       <div className="option-grid">
         {currentQ.options.map((option, idx) => (
@@ -114,20 +165,15 @@ const TaskFeedback = ({ taskId, userId, onComplete }) => {
             className="option-btn"
             onClick={() => handleAnswer(option)}
             disabled={saving}
+            style={{ textAlign: 'left', lineHeight: 1.5 }}
           >
             {typeof option === 'object' ? option.text : option}
-            <span style={{ opacity: 0.5 }}>→</span>
+            <span style={{ opacity: 0.4, flexShrink: 0 }}>→</span>
           </button>
         ))}
       </div>
-      
-      {saving && <p style={{ textAlign: 'center', marginTop: '1rem', opacity: 0.6 }}>Saving reflection...</p>}
     </div>
   );
-};
-
-const styles = {
-  label: { fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--text-muted)' }
 };
 
 export default TaskFeedback;

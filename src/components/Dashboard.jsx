@@ -80,7 +80,7 @@ const Dashboard = ({ user, history = [], lastResult, progress, onAction }) => {
       </div>
 
       {/* Stats Row */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
         {[
           { label: 'CURRENT LEVEL', value: Math.min(activeLevel, 2), color: 'var(--secondary)', icon: '🏆' },
           { label: 'DISCOVERIES', value: (history || []).length, color: 'var(--accent)', icon: '🧭' },
@@ -93,6 +93,21 @@ const Dashboard = ({ user, history = [], lastResult, progress, onAction }) => {
           </div>
         ))}
       </div>
+
+      {/* Journey Progress Bar */}
+      {(() => {
+        const levelsComplete = [0,1,2].filter(hasCompleted).length;
+        const pct = Math.round((levelsComplete / 3) * 100);
+        return (
+          <div className="glass-card" style={{ padding: '1rem 1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: '700', opacity: 0.5, letterSpacing: '1px', whiteSpace: 'nowrap' }}>JOURNEY PROGRESS</div>
+            <div style={{ flex: 1, height: '8px', background: 'rgba(255,255,255,0.08)', borderRadius: '10px', overflow: 'hidden' }}>
+              <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg, var(--primary), var(--accent))', borderRadius: '10px', transition: 'width 1s ease' }} />
+            </div>
+            <div style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--accent)', minWidth: '40px', textAlign: 'right' }}>{pct}%</div>
+          </div>
+        );
+      })()}
 
       <div className="grid-2-1" style={{ gap: '2rem', alignItems: 'start' }}>
         {/* Left: Level Cards */}
@@ -196,14 +211,7 @@ const Dashboard = ({ user, history = [], lastResult, progress, onAction }) => {
                       <button
                         className="btn btn-outline"
                         style={{ width: '100%', padding: '0.65rem', fontSize: '0.85rem' }}
-                        onClick={() => {
-                          if (lvlCfg.id === activeLevel) {
-                            const newSession = { level: lvlCfg.id, screen: 'questions', answers: [], scores: {}, topTrait: null, task: null };
-                            onAction('questions');
-                          } else {
-                            onAction('questions');
-                          }
-                        }}
+                        onClick={() => onAction('questions', lvlCfg.id)}
                       >
                         🔄 Replay Level {lvlCfg.id}
                       </button>
@@ -283,7 +291,7 @@ const Dashboard = ({ user, history = [], lastResult, progress, onAction }) => {
                 👤 My Growth Profile
               </button>
               <button className="btn btn-outline" style={{ justifyContent: 'flex-start', padding: '0.75rem 1rem', fontSize: '0.9rem' }} onClick={() => onAction('tasks')}>
-                🎯 Task Library
+                🎯 Browse Task Library
               </button>
               {allLevelsComplete && (
                 <button className="btn btn-outline" style={{ justifyContent: 'flex-start', padding: '0.75rem 1rem', fontSize: '0.9rem', borderColor: 'rgba(138,43,226,0.4)', color: 'var(--primary)' }} onClick={() => onAction('final-report')}>

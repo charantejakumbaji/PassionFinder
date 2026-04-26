@@ -206,7 +206,7 @@ function App() {
     }
   };
 
-  const handleAction = async (action) => {
+  const handleAction = async (action, targetLevel = null) => {
     if (action === 'logout') {
       await logoutUser();
       setCurrentUser(null);
@@ -221,11 +221,14 @@ function App() {
       const resumeScreen = session.screen && session.screen !== 'dashboard' ? session.screen : 'questions';
       setCurrentScreen(resumeScreen);
     } else if (action === 'questions') {
-      const startLevel = session.level || 0;
+      // targetLevel lets Dashboard specify exactly which level to (re)play
+      const startLevel = targetLevel !== null ? targetLevel : (session.level || 0);
       const newSession = { ...session, level: startLevel, screen: 'questions', answers: [], scores: {}, topTrait: null, task: null };
       setSession(newSession);
       if (currentUser) await saveProgress(currentUser.id, newSession);
       setCurrentScreen('questions');
+    } else if (action === 'tasks') {
+      setCurrentScreen('tasks');
     } else {
       setCurrentScreen(action);
     }
@@ -246,20 +249,22 @@ function App() {
 
   const handleLevelAction = async (type) => {
     if (type === 'next') {
-      const nextLevel = Math.min((session.level || 0) + 1, 2);
+      const currentLevel = session.level || 0;
       const allLevelsComplete = history.some(h => h.level === 2);
-      // If completing level 2, go to final report
-      if (session.level === 2 || allLevelsComplete) {
+      // If completing level 2 OR all levels done, go to final report
+      if (currentLevel === 2 || allLevelsComplete) {
         setCurrentScreen('final-report');
         return;
       }
+      const nextLevel = Math.min(currentLevel + 1, 2);
       const newSession = { level: nextLevel, screen: 'dashboard', answers: [], scores: {}, topTrait: null, task: null };
       setSession(newSession);
       if (currentUser) await saveProgress(currentUser.id, newSession);
       setCurrentScreen('dashboard');
-    } else {
-      // Loop current level
-      const newSession = { level: session.level || 0, screen: 'questions', answers: [], scores: {}, topTrait: null, task: null };
+    } else if (type === 'loop') {
+      // Retry the exact current level
+      const retryLevel = session.level || 0;
+      const newSession = { level: retryLevel, screen: 'questions', answers: [], scores: {}, topTrait: null, task: null };
       setSession(newSession);
       if (currentUser) await saveProgress(currentUser.id, newSession);
       setCurrentScreen('questions');
@@ -311,6 +316,10 @@ function App() {
           updateSession({ task, screen: 'task-execution' });
           setCurrentScreen('task-execution');
         }} />;
+
+      case 'tasks':
+        // Standalone task library — browse all tasks
+        return <Tasks user={currentUser} autoTrait={null} autoLevel={session.level} onSelectTask={null} />;
       
       case 'task-execution':
         return <TaskExecutionScreen 

@@ -105,7 +105,6 @@ const FinalResults = ({ session, history = [], onRestart, onSaveResult, onLevelA
       {/* Action Buttons */}
       <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
         {justCompletedLevel2 ? (
-          // Level 2 done: show retry + final report
           <>
             <button
               className="btn btn-primary btn-large"
@@ -119,29 +118,29 @@ const FinalResults = ({ session, history = [], onRestart, onSaveResult, onLevelA
               onClick={() => onLevelAction ? onLevelAction('loop') : onRestart()}
               style={{ flex: 1, minWidth: '200px' }}
             >
-              🔄 Retry Level 2
+              🔄 Retry Level 2 Again
             </button>
           </>
         ) : (
-          // Level 0 or 1 done: advance or loop
           <>
             <button
               className="btn btn-primary btn-large"
               onClick={() => onLevelAction ? onLevelAction('next') : onRestart()}
               style={{ flex: 1, minWidth: '200px' }}
             >
-              {NEXT_LEVEL_LABELS[currentLevel + 1] || `Advance to Level ${currentLevel + 1}`} →
+              {currentLevel === 0 ? '🔓 Unlock Level 1 →' : '🔓 Unlock Level 2 →'}
             </button>
             <button
               className="btn btn-outline btn-large"
               onClick={() => onLevelAction ? onLevelAction('loop') : onRestart()}
               style={{ flex: 1, minWidth: '200px' }}
             >
-              🔄 Retry Level {currentLevel}
+              🔄 Redo Level {currentLevel}
             </button>
           </>
         )}
       </div>
+
     </div>
   );
 };
