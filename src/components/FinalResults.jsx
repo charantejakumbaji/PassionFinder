@@ -42,7 +42,7 @@ const FinalResults = ({ session, history = [], onRestart, onSaveResult, onLevelA
           Level {currentLevel} — {LEVEL_NAMES[currentLevel] || 'Discovery'} Complete
         </span>
         <div style={{ fontSize: '3rem', margin: '0.75rem 0' }}>{data.icon}</div>
-        <h2 style={{ fontSize: '2rem', marginBottom: '0.25rem' }}>You are a {data.label}</h2>
+        <h2 style={{ marginBottom: '0.25rem' }}>You are a {data.label}</h2>
         <p style={{ opacity: 0.6 }}>Based on your instincts and task verification.</p>
       </div>
 

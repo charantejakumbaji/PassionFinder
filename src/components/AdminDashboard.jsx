@@ -166,7 +166,7 @@ const AdminDashboard = () => {
     <div className="glass-card animate-up" style={{ maxWidth: '1000px', width: '100%' }}>
       <div className="flex-column-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
         <h2>Admin Dashboard</h2>
-        <div style={{ display: 'flex', gap: '0.35rem', overflowX: 'auto', paddingBottom: '0.5rem', width: '100%', justifyContent: 'flex-end' }} className="w-100-mobile">
+        <div style={{ display: 'flex', gap: '0.35rem', overflowX: 'auto', paddingBottom: '0.5rem', width: '100%', justifyContent: 'flex-start' }} className="w-100-mobile hide-scrollbar">
           {['overview', 'questions', 'tasks', 'users', 'feedback', 'settings'].map(tab => (
             <button 
               key={tab}

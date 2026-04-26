@@ -104,7 +104,7 @@ const Tasks = ({ user, autoTrait, autoLevel, onSelectTask }) => {
         {tasks.map((task) => (
           <div 
             key={task.id} 
-            className="glass-card" 
+            className="glass-card task-card-inner" 
             style={{ 
               padding: '1.5rem', 
               display: 'flex', 

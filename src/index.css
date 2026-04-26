@@ -431,6 +431,12 @@ textarea.auth-input {
 
   .flex-column-mobile {
     flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+
+  .flex-column-mobile > * {
+    width: 100% !important;
   }
 
   .w-100-mobile {
@@ -440,17 +446,27 @@ textarea.auth-input {
 
 /* Mobile adjustments */
 @media (max-width: 768px) {
-  h1 { font-size: 2rem; }
-  h2 { font-size: 1.5rem; }
-  .glass-card { padding: 1.5rem; border-radius: 20px; }
-  .btn { padding: 0.75rem 1.5rem; font-size: 0.95rem; }
-  .app-content { padding: 1rem; }
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.4rem; }
+  h3 { font-size: 1.1rem; }
+  .glass-card { padding: 1.25rem; border-radius: 20px; }
+  .btn { padding: 0.75rem 1.25rem; font-size: 0.9rem; }
+  .btn-large { padding: 1rem 2rem; font-size: 1.1rem; }
+  .app-content { padding: 0.75rem; }
+  
+  /* Task card specific mobile fix */
+  .task-card-inner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
 }
 
 @media (max-width: 480px) {
-  h1 { font-size: 1.75rem; }
-  .option-btn { padding: 1rem; font-size: 1rem; }
-  .timer-circle { width: 60px; height: 60px; font-size: 1.2rem; }
+  h1 { font-size: 1.6rem; }
+  .glass-card { padding: 1rem; border-radius: 16px; }
+  .option-btn { padding: 0.85rem; font-size: 0.95rem; }
+  .timer-circle { width: 55px; height: 55px; font-size: 1.1rem; }
+  .app-content { padding: 0.5rem; }
 }
 
 /* Utilities - desktop defaults */
@@ -465,4 +481,13 @@ textarea.auth-input {
 /* mt-2 utility */
 .mt-2 {
   margin-top: 1rem;
+}
+
+/* Scrollbar Utility */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

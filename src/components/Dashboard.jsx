@@ -71,10 +71,10 @@ const Dashboard = ({ user, history = [], lastResult, progress, onAction }) => {
     <div style={{ width: '100%', maxWidth: '1100px', animation: 'fadeInUp 0.5s ease-out' }}>
       {/* Header */}
       <div style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ fontSize: '2.8rem', fontWeight: '800', marginBottom: '0.5rem', lineHeight: 1.1 }}>
+        <h1 style={{ fontWeight: '800', marginBottom: '0.5rem', lineHeight: 1.1 }}>
           Welcome back, <span className="text-gradient">{user?.user_metadata?.full_name?.split(' ')[0] || 'Explorer'}</span>
         </h1>
-        <p style={{ opacity: 0.6, fontSize: '1.1rem' }}>
+        <p style={{ opacity: 0.6 }}>
           {allLevelsComplete ? '🎉 All levels mastered! View your final passion report.' : 'Your discovery path is expanding.'}
         </p>
       </div>
@@ -136,8 +136,8 @@ const Dashboard = ({ user, history = [], lastResult, progress, onAction }) => {
                   <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(138,43,226,0.04), rgba(0,242,254,0.02))', pointerEvents: 'none' }} />
                 )}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }} className="flex-column-mobile">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }} className="w-100-mobile">
                     <div style={{
                       width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',

@@ -104,10 +104,10 @@ const FinalReport = ({ session, history = [], onRestart, onGoHome }) => {
           🏆 PASSION FINDER — FINAL PASSION REPORT
         </span>
         <div style={{ fontSize: '4rem', margin: '0.5rem 0 1rem' }}>{profile.icon}</div>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '0.5rem', lineHeight: 1.1 }}>
+        <h1 style={{ fontWeight: '800', marginBottom: '0.5rem', lineHeight: 1.1 }}>
           <span className="text-gradient">{profile.type}</span>
         </h1>
-        <p style={{ fontSize: '1.1rem', opacity: 0.8, maxWidth: '540px', margin: '0 auto 1.5rem', lineHeight: 1.7 }}>
+        <p style={{ opacity: 0.8, maxWidth: '540px', margin: '0 auto 1.5rem', lineHeight: 1.7 }}>
           {profile.description}
         </p>
         <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
